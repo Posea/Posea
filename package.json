@@ -1,0 +1,33 @@
+{
+  "name": "posea",
+  "version": "1.0.0",
+  "description": "POSt EAsy: Yet another self-hosted comment system",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Posea/Posea.git"
+  },
+  "keywords": [
+    "comment",
+    "self-hosted"
+  ],
+  "author": "The Posea Authors",
+  "license": "AGPL-3.0",
+  "bugs": {
+    "url": "https://github.com/Posea/Posea/issues"
+  },
+  "homepage": "https://github.com/Posea/Posea#readme",
+  "devDependencies": {
+    "babel-cli": "^6.24.1",
+    "babel-preset-env": "^1.5.2",
+    "coffeescript": "^2.0.0-beta2",
+    "mocha": "^3.4.2"
+  },
+  "dependencies": {
+    "express": "^4.15.3",
+    "mongodb": "^2.2.29"
+  }
+}
