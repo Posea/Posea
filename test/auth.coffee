@@ -16,7 +16,7 @@
 ###
 
 import 'babel-polyfill'
-import { hmac } from '../lib/auth'
+import { hmac, authorize, confirm_authorization, check_token } from '../lib/auth'
 import assert from 'assert'
 
 describe 'Auth', ->
@@ -26,3 +26,24 @@ describe 'Auth', ->
     assert (await hmac('v45m9iv4n9reoknivcwoepvpq,cp[qmcqovnreiobeuheiobn0095n49054mnm40n-605-990n344opb3mb3', 'erbtrbntrenytenytm63njm564m87641456')) is '55fb2ac65450dda81182d406ea6a20e388b0387b643226b9e4f880a4f2d8cdf3'
   it 'HMAC test suite 3', ->
     assert (await hmac('A quick brown fox jumps over a lazy dog', '32f34grebvr3h5hn5k86')) is '416bfbff551a602bf194a269217fee0d77637fd57235dd8b75098835e34bebec'
+  it 'Authorization algorithm test suite 1', ->
+    [token, time] = await authorize 'test@domain.com'
+    assert (await confirm_authorization token, time, 'test@domain.com') isnt null
+  it 'Authorization algorithm test suite 2', ->
+    [token, time] = await authorize 'test@domain.com'
+    assert (await confirm_authorization token, time + 1000, 'test@domain.com') is null
+  it 'Authorization algorithm test suite 3', ->
+    [token, time] = await authorize 'test@domain.com'
+    assert (await confirm_authorization token, time, 'test1@domain.com') is null
+  it 'Authorization algorithm test suite 4', ->
+    [auth, time] = await authorize 'test@domain.com'
+    [token, time] = await confirm_authorization auth, time, 'test@domain.com'
+    assert (await check_token token, time, 'test@domain.com') is true
+  it 'Authorization algorithm test suite 5', ->
+    [auth, time] = await authorize 'test@domain.com'
+    [token, time] = await confirm_authorization auth, time, 'test@domain.com'
+    assert (await check_token token, time, 'test1@domain.com') is false
+  it 'Authorization algorithm test suite 6', ->
+    [auth, time] = await authorize 'test@domain.com'
+    [token, time] = await confirm_authorization auth, time, 'test@domain.com'
+    assert (await check_token token, time - 1, 'test@domain.com') is false

@@ -27,4 +27,45 @@ export hmac = (data, secret) -> new Promise (resolve, reject) =>
   h.write data
   h.end()
 
-token = (email) -> hmac email, config.secret
+# Called when a user tries to comment for the first time
+# A token for authentication will be generated and later sent to the user's mailbox
+# Must be confirmed within conifg.auth_timeout
+# @return: [token, timestamp]
+export authorize = (email) ->
+  obj =
+    type: 'auth'
+    time: new Date().getTime()
+    email: email
+  token = await hmac JSON.stringify(obj), config.secret
+  return [token, obj.time]
+
+# Called when a user clicks on the confirmation link in the mailbox
+# Checks whether auth_token is valid and signs a new token to tag the user as logged in.
+# @return:
+#   null if authentication failed
+#   [token, timestamp] if succeeded
+export confirm_authorization = (auth_token, time, email) ->
+  auth_obj =
+    type: 'auth'
+    time: time
+    email: email
+  if auth_token isnt await hmac(JSON.stringify(auth_obj), config.secret)
+    return null
+  if time + config.auth_timeout * 1000 < new Date().getTime()
+    return null
+  obj =
+    type: 'login'
+    time: new Date().getTime()
+    email: email
+  token = await hmac JSON.stringify(obj), config.secret
+  return [token, obj.time]
+
+# Check if a token is valid with regard to a timestamp and an e-mail address
+# TODO: Token revocation. Might be done through a simple blacklist.
+# @return: boolean
+export check_token = (token, time, email) ->
+  obj =
+    type: 'login'
+    time: time
+    email: email
+  token == await hmac JSON.stringify(obj), config.secret
