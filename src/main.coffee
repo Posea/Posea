@@ -15,6 +15,7 @@
   along with Posea.  If not, see <http://www.gnu.org/licenses/>.
 ###
 
+import 'babel-polyfill'
 import express from 'express'
 import { MongoClient } from 'mongodb'
 import { log, logInit } from './log'
@@ -42,4 +43,6 @@ main = ->
     app.listen config.http.port, =>
       log.info "Listening on http://127.0.0.1:#{config.http.port}"
 
-main null
+if typeof global.it isnt 'function'
+  # Not in Mocha
+  main null

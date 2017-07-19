@@ -25,10 +25,16 @@ sharedCallback = (callback) -> (err) ->
   callback() if callback? and callback instanceof Function
 
 build = (callback) ->
-  execLive 'node_modules/.bin/coffee -o mid -c src && node_modules/.bin/babel --presets env -d lib mid && rm -rf mid', callback
+  execLive 'node_modules/.bin/coffee -o mid -c src && node_modules/.bin/babel -d lib mid && rm -rf mid', callback
 
 start = (callback) ->
   build => execLive 'npm start', callback
 
+test = (callback) ->
+  build =>
+    execLive 'node_modules/.bin/coffee -o test_mid -c test && node_modules/.bin/babel -d test_js test_mid && rm -rf test_mid', =>
+      execLive 'node_modules/.bin/mocha test_js', callback
+
 task 'build', 'Build the project', build
 task 'start', 'Build and run the project', start
+task 'test', 'Run the test suite', test
