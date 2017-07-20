@@ -33,9 +33,9 @@ level = logInit null
 log.verbose "Logging level set to #{level}"
 
 langInit null
-log.info LANG.str['hello']
 
 main = ->
+  log.info LANG.str['hello']
   dbUrl = "mongodb://#{config.mongo.server}:#{config.mongo.port}/#{config.mongo.db}"
   log.info "Connecting to #{dbUrl}"
   MongoClient.connect dbUrl, (err, db) =>

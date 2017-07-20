@@ -15,11 +15,16 @@
   along with Posea.  If not, see <http://www.gnu.org/licenses/>.
 ###
 
-{exec} = require 'child_process'
+{spawn} = require 'child_process'
 
 execLive = (cmd, callback) ->
-  exec cmd, sharedCallback(callback)
-    .stdout.pipe process.stdout
+  #exec cmd, sharedCallback(callback)
+  #  .stdout.pipe process.stdout
+  p = spawn cmd, [], { stdio: 'inherit', shell: true }
+  p.on 'exit', =>
+    callback() if callback? and callback instanceof Function
+  p.on 'error', (err) =>
+    callback err if callback? and callback instanceof Function
 sharedCallback = (callback) -> (err) ->
   throw err if err
   callback() if callback? and callback instanceof Function
