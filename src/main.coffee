@@ -20,6 +20,7 @@ import express from 'express'
 import { MongoClient } from 'mongodb'
 import { log, logInit } from './log'
 import { langInit, LANG } from './lang'
+import { mailInit } from './mail'
 
 # Load configuration
 export env = process.env.NODE_ENV
@@ -33,6 +34,7 @@ level = logInit null
 log.verbose "Logging level set to #{level}"
 
 langInit null
+mailInit null
 
 main = ->
   log.info LANG.str['hello']

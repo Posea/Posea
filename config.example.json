@@ -2,6 +2,17 @@
   "lang": "en_US",
   "secret": "some random string",
   "auth_timeout": 3600,
+  "smtp": {
+    "from": "user@example.com",
+    "from_name": "John Smith",
+    "host": "smtp.example.com",
+    "port": 465,
+    "secure": true,
+    "auth": {
+      "user": "user@example.com",
+      "pass": "some password"
+    }
+  },
   "mongo": {
     "server": "127.0.0.1",
     "port": 27017,
