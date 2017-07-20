@@ -19,6 +19,7 @@ import 'babel-polyfill'
 import express from 'express'
 import { MongoClient } from 'mongodb'
 import { log, logInit } from './log'
+import { langInit, LANG } from './lang'
 
 # Load configuration
 export env = process.env.NODE_ENV
@@ -30,6 +31,9 @@ export app = null
 
 level = logInit null
 log.verbose "Logging level set to #{level}"
+
+langInit null
+log.info LANG.str['hello']
 
 main = ->
   dbUrl = "mongodb://#{config.mongo.server}:#{config.mongo.port}/#{config.mongo.db}"

@@ -1,4 +1,5 @@
 {
+  "lang": "en_US",
   "secret": "some random string",
   "auth_timeout": 3600,
   "mongo": {
