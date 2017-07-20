@@ -1,4 +1,6 @@
 {
+  "base_url": "https://example.com",
+  "site_title": "Example Site",
   "lang": "en_US",
   "secret": "some random string",
   "auth_timeout": 3600,

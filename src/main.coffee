@@ -21,6 +21,7 @@ import { MongoClient } from 'mongodb'
 import { log, logInit } from './log'
 import { langInit, LANG } from './lang'
 import { mailInit } from './mail'
+import { authRoutes } from './auth'
 
 # Load configuration
 export env = process.env.NODE_ENV
@@ -45,7 +46,7 @@ main = ->
     log.info "MongoDB connection established."
     databse = db
     app = express()
-    # TODO: Setup routes
+    authRoutes app
     app.listen config.http.port, =>
       log.info "Listening on http://127.0.0.1:#{config.http.port}"
 

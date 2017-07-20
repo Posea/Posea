@@ -22,3 +22,18 @@ import { LANG } from '../lang'
 if config.lang == 'zh_CN'
   LANG.str =
     'hello': '你好，世界。'
+    'auth_email_title': '{{title}} 登录确认'
+
+  LANG.str['auth_email_content'] = '''
+您好，
+<br/><br/>
+您正在尝试使用这个邮箱登录 {{title}} 的评论系统。请点击以下链接来确认:
+<br/><br/>
+<a href='{{url}}'>{{url}}</a>
+<br/><br/>
+如果上面的链接不可点击，请手动复制到浏览器地址栏。
+<br/><br/>
+如果您对本邮件提及的内容毫不知情，请忽略本邮件；如果您一直收到这样的邮件并认为受到打扰，请联系 {{base_url}} 的管理员。
+<br/><br/>
+谢谢。
+'''

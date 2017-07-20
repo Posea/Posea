@@ -16,7 +16,50 @@
 ###
 
 import { config } from "./main"
+import { sendMail } from "./mail"
+import { LANG } from "./lang"
 import * as crypto from 'crypto'
+
+export authRoutes = (app) ->
+  app.get '/auth/login', auth_login
+  app.get '/auth/confirm', auth_confirm
+
+auth_login = (req, res) ->
+  # TODO: Rate limit - Do not allow a user to authenticate twice within auth_timeout
+  # TODO: Blacklisting - Disallow specific users from trying to login or comment. (Revokes the logged-in state)
+  # TODO: Validate e-mail address first
+  if !req.query.email?
+    res.sendStatus 406
+  else
+    [token, time] = await authorize req.query.email
+    url = config.base_url + "/auth/confirm?email=#{req.query.email}&time=#{time}&token=#{token}"
+    try
+      await sendMail(
+        req.query.email,
+        LANG.str['auth_email_title'].replace('{{title}}', config.site_title),
+        LANG.str['auth_email_content']
+          .replace(/\{\{title\}\}/g, config.site_title)
+          .replace(/\{\{base_url\}\}/g, config.base_url)
+          .replace(/\{\{url\}\}/g, url)
+      )
+      res.send JSON.stringify ok: true
+    catch e
+      res.sendStatus 406
+
+auth_confirm = (req, res) ->
+  # TODO: Invalidate the token after being used.
+  if !req.query.token? || !req.query.email? || !req.query.time?
+    res.sendStatus 406
+  else
+    c = await confirm_authorization req.query.token, req.query.time, req.query.email
+    if !c?
+      res.sendStatus 403
+    else
+      [token, time] = c
+      res.cookie 'POSEA-USER-EMAIL', req.query.email
+      res.cookie 'POSEA-USER-TOKEN', token
+      res.cookie 'POSEA-USER-TIME', time
+      res.redirect 302, config.base_url
 
 export hmac = (data, secret) -> new Promise (resolve, reject) =>
   h = crypto.createHmac 'sha256', secret
@@ -47,7 +90,7 @@ export authorize = (email) ->
 export confirm_authorization = (auth_token, time, email) ->
   auth_obj =
     type: 'auth'
-    time: time
+    time: Number.parseInt time
     email: email
   if auth_token isnt await hmac(JSON.stringify(auth_obj), config.secret)
     return null

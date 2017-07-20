@@ -22,3 +22,18 @@ import { LANG } from '../lang'
 if config.lang == 'en_US'
   LANG.str =
     'hello': 'Hello, world.'
+    'auth_email_title': '{{title}} login confirmation'
+
+  LANG.str['auth_email_content'] = '''
+Hello,
+<br/><br/>
+You are receiving this e-mail because you tried to use this e-mail address to comment on {{title}}. Please click on the following link to confirm this action:
+<br/><br/>
+<a href='{{url}}'>{{url}}</a>
+<br/><br/>
+If it does not show as a link, please copy and paste it to the address bar manually.
+<br/><br/>
+If you know nothing about this request, please ignore this e-mail. If you keep receiving these e-mails, please contact the administrators at {{base_url}}.
+<br/><br/>
+Regards.
+'''
