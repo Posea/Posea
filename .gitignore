@@ -3,3 +3,4 @@ test_js
 node_modules
 config.*.json
 !config.example.json
+yarn.lock

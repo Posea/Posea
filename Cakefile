@@ -28,7 +28,7 @@ build = (callback) ->
   execLive 'node_modules/.bin/coffee -o mid -c src && node_modules/.bin/babel -d lib mid && rm -rf mid', callback
 
 start = (callback) ->
-  build => execLive 'npm start', callback
+  build => execLive 'yarn start', callback
 
 test = (callback) ->
   build =>
