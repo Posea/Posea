@@ -26,6 +26,7 @@ export authRoutes = (app) ->
 
 auth_login = (req, res) ->
   # TODO: Rate limit - Do not allow a user to authenticate twice within auth_timeout
+  # TODO: Rate limit - IP based.
   # TODO: Blacklisting - Disallow specific users from trying to login or comment. (Revokes the logged-in state)
   # TODO: Validate e-mail address first
   if !req.query.email?
