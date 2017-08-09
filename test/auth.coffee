@@ -40,6 +40,8 @@ describe 'Auth', ->
   before ->
     await initDB()
     initAuth()
+  after ->
+    await main.database.dropDatabase()
   it 'HMAC test suite 1', ->
     assert (await hmac('some data to hash', 'a secret')) is '7fd04df92f636fd450bc841c9418e5825c17f33ad9c87c518115a45971f7f77e'
   it 'HMAC test suite 2', ->
