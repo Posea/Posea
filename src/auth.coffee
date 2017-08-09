@@ -15,14 +15,20 @@
   along with Posea.  If not, see <http://www.gnu.org/licenses/>.
 ###
 
-import { config } from "./main"
+import { config, database } from "./main"
 import { sendMail } from "./mail"
 import { LANG } from "./lang"
+import { log } from "./log"
 import * as crypto from 'crypto'
+
+# Collection for revoking authentication tokens
+cAuth = null
+# TODO: Collection for blacklisting users
 
 export authRoutes = (app) ->
   app.get '/auth/login', auth_login
   app.get '/auth/confirm', auth_confirm
+  cAuth = database.collection('auth')
 
 auth_login = (req, res) ->
   # TODO: Rate limit - Do not allow a user to authenticate twice within auth_timeout
@@ -48,7 +54,6 @@ auth_login = (req, res) ->
       res.sendStatus 406
 
 auth_confirm = (req, res) ->
-  # TODO: Invalidate the token after being used.
   if !req.query.token? || !req.query.email? || !req.query.time?
     res.sendStatus 406
   else
@@ -89,6 +94,14 @@ export authorize = (email) ->
 #   null if authentication failed
 #   [token, timestamp] if succeeded
 export confirm_authorization = (auth_token, time, email) ->
+  try
+    # Check if this token has been used or revoked
+    result = await cAuth.findOne { token: auth_token }
+    return null if result isnt null
+  catch error
+    # Never mind (might be in Mocha test)
+    # TODO: Make this work in Mocha tests
+    log.verbose error
   auth_obj =
     type: 'auth'
     time: Number.parseInt time
@@ -102,6 +115,12 @@ export confirm_authorization = (auth_token, time, email) ->
     time: new Date().getTime()
     email: email
   token = await hmac JSON.stringify(obj), config.secret
+  try
+    # Revoke this authorization token before distributing the login token
+    await cAuth.insertOne { token: auth_token }
+  catch error
+    # Never mind (might be in Mocha test)
+    log.verbose error
   return [token, obj.time]
 
 # Check if a token is valid with regard to a timestamp and an e-mail address

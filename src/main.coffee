@@ -44,7 +44,7 @@ main = ->
   MongoClient.connect dbUrl, (err, db) =>
     throw err if err
     log.info "MongoDB connection established."
-    databse = db
+    database = db
     app = express()
     authRoutes app
     app.listen config.http.port, =>
