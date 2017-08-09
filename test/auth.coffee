@@ -16,10 +16,30 @@
 ###
 
 import 'babel-polyfill'
-import { hmac, authorize, confirm_authorization, check_token } from '../lib/auth'
+import * as main from '../lib/main'
+import { MongoClient } from 'mongodb'
+import { hmac, authorize, confirm_authorization, check_token, initAuth } from '../lib/auth'
 import assert from 'assert'
 
+# For testing
+# WARNING: DO NOT RUN IN PRODUCTION
+# NEEDS MongoDB on 127.0.0.1:27017
+connectMongo = ->
+  new Promise (resolve, reject) =>
+    MongoClient.connect 'mongodb://127.0.0.1:27017/posea_test_auth', (err, db) ->
+      if err?
+        reject err
+      else
+        resolve db
+
+initDB = ->
+  if main.database is null
+    main.setDB await connectMongo()
+
 describe 'Auth', ->
+  before ->
+    await initDB()
+    initAuth()
   it 'HMAC test suite 1', ->
     assert (await hmac('some data to hash', 'a secret')) is '7fd04df92f636fd450bc841c9418e5825c17f33ad9c87c518115a45971f7f77e'
   it 'HMAC test suite 2', ->
@@ -47,3 +67,7 @@ describe 'Auth', ->
     [auth, time] = await authorize 'test@domain.com'
     [token, time] = await confirm_authorization auth, time, 'test@domain.com'
     assert (await check_token token, time - 1, 'test@domain.com') is false
+  it 'Should not allow one to login twice', ->
+    [auth, time] = await authorize 'test@domain.com'
+    [token, time] = await confirm_authorization auth, time, 'test@domain.com'
+    assert (await confirm_authorization auth, time, 'test@domain.com') is null

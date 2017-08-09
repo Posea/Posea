@@ -28,6 +28,9 @@ cAuth = null
 export authRoutes = (app) ->
   app.get '/auth/login', auth_login
   app.get '/auth/confirm', auth_confirm
+  initAuth()
+
+export initAuth = ->
   cAuth = database.collection('auth')
 
 auth_login = (req, res) ->
@@ -99,8 +102,7 @@ export confirm_authorization = (auth_token, time, email) ->
     result = await cAuth.findOne { token: auth_token }
     return null if result isnt null
   catch error
-    # Never mind (might be in Mocha test)
-    # TODO: Make this work in Mocha tests
+    # Never mind
     log.verbose error
   auth_obj =
     type: 'auth'
@@ -119,7 +121,7 @@ export confirm_authorization = (auth_token, time, email) ->
     # Revoke this authorization token before distributing the login token
     await cAuth.insertOne { token: auth_token }
   catch error
-    # Never mind (might be in Mocha test)
+    # Never mind
     log.verbose error
   return [token, obj.time]
 

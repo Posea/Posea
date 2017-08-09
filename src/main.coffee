@@ -50,6 +50,8 @@ main = ->
     app.listen config.http.port, =>
       log.info "Listening on http://127.0.0.1:#{config.http.port}"
 
+export setDB = (db) -> database = db
+
 if typeof global.it isnt 'function'
   # Not in Mocha
   main null
